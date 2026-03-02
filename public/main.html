@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reloaded Proxy</title>
+
+    <script src="/scram/scramjet.all.js"></script>
+    <script src="/baremux/index.js"></script>
+
+    <link rel="stylesheet" href="index.css" />
+    <script src="register-sw.js" defer></script>
+    <script src="search.js" defer></script>
+    <script src="index.js" defer></script>
+
+    <style>
+        body,
+        html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            position: relative;
+        }
+
+        /* Black/White Space Theme */
+        .stars {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 1;
+        }
+
+        .star {
+            position: absolute;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 0 10px white, 0 0 20px white;
+            animation: twinkle var(--duration, 4s) infinite ease-in-out alternate;
+        }
+
+        @keyframes twinkle {
+            0% {
+                opacity: 0.2;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 1;
+                transform: scale(1.2);
+            }
+        }
+
+        .glowing-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 800px;
+            height: 800px;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+            animation: pulse 6s infinite ease-in-out alternate;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: translate(-50%, -50%) scale(0.9);
+                opacity: 0.7;
+            }
+
+            100% {
+                transform: translate(-50%, -50%) scale(1.1);
+                opacity: 1;
+            }
+        }
+
+        .content-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+
+        .proxy-title {
+            font-size: 3rem;
+            font-weight: 300;
+            letter-spacing: 15px;
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            animation: float 4s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes textGlow {
+            from {
+                text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+            }
+
+            to {
+                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #aaa;
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(0px);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+
+            100% {
+                transform: translateY(0px);
+            }
+        }
+
+        .search-container {
+            position: relative;
+            width: 50vw;
+            max-width: 600px;
+            animation: float 5s ease-in-out infinite alternate-reverse;
+        }
+
+        /* Override index.css form for new style */
+        #sj-form {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+        }
+
+        #sj-address {
+            width: 100%;
+            height: 60px;
+            border-radius: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.05);
+            padding: 0 30px;
+            font-size: 1.2rem;
+            color: #fff;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            outline: none;
+            text-align: center;
+        }
+
+        #sj-address:focus {
+            border-color: rgba(255, 255, 255, 0.8);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        #sj-address::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+            text-align: center;
+        }
+
+        .by-text {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            letter-spacing: 2px;
+            z-index: 10;
+        }
+
+        .messages {
+            margin-top: 1rem;
+            text-align: center;
+        }
+
+        #sj-error {
+            color: #ffaaaa !important;
+        }
+
+        /* Iframe when proxying */
+        #sj-frame {
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            position: absolute;
+            z-index: 9999;
+            background: #fff;
+            /* iframe background needs to be solid */
+        }
+    </style>
+</head>
+
+<body>
+    <div class="stars" id="stars"></div>
+    <div class="glowing-bg"></div>
+
+    <div class="content-container">
+        <h1 class="proxy-title">Reloaded</h1>
+
+        <form id="sj-form" class="search-container">
+            <input id="sj-search-engine" value="https://www.google.com/search?q=%s" type="hidden" />
+            <input id="sj-address" type="text" placeholder="Search the web freely..." autocomplete="off" />
+        </form>
+
+        <div class="messages">
+            <p id="sj-error"></p>
+            <pre id="sj-error-code"></pre>
+        </div>
+    </div>
+
+    <div class="by-text">by ArciiTaken</div>
+
+    <script>
+        // Generate stars for space theme
+        const starsContainer = document.getElementById('stars');
+        for (let i = 0; i < 150; i++) {
+            const star = document.createElement('div');
+            star.classList.add('star');
+
+            // Random size big and small
+            const size = Math.random() * 3 + 1;
+            star.style.width = size + 'px';
+            star.style.height = size + 'px';
+
+            // Random position
+            star.style.left = Math.random() * 100 + 'vw';
+            star.style.top = Math.random() * 100 + 'vh';
+
+            // Random duration
+            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+
+            starsContainer.appendChild(star);
+        }
+    </script>
+</body>
+
+</html>

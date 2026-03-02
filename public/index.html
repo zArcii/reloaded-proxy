@@ -1,66 +1,114 @@
-<!doctype html>
-<html>
-	<head>
-		<meta charset="utf-8" />
-		<meta
-			name="viewport"
-			content="width=device-width, initial-scale=1.0, shrink-to-fit=no"
-		/>
-		<title>Scramjet</title>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>No internet</title>
+    <style>
+        body {
+            background-color: #202124;
+            color: #9aa0a6;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            user-select: none;
+        }
 
-		<link rel="shortcut icon" content="favicon.webp" />
-	
-		<script src="/scram/scramjet.all.js"></script>
-		<script src="/baremux/index.js"></script>
-		
-		<link rel="stylesheet" href="index.css" />
-		<script src="register-sw.js" defer></script>
-		<script src="search.js" defer></script>
-		<script src="index.js" defer></script>
-	</head>
+        .container {
+            max-width: 600px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            margin-top: -100px;
+        }
 
-	<body>
-		<div title="Scramjet Logo" class="flex-center logo-wrapper header-center">
-			<img class="logo" src="sj.png" alt="Scramjet" />
-			<h1>Scramjet | MW</h1>
-		</div>
-		<div class="flex-center desc left-margin">
-			<p>
-				Scramjet is an experimental interception based web proxy designed to
-				evade internet censorship, bypass arbitrary web browser restrictions and
-				innovate web proxy technologies.
-			</p>
-		</div>
+        .dino-icon {
+            width: 44px;
+            height: 48px;
+            background-color: #9aa0a6;
+            -webkit-mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 48"><path d="M22 0h22v6h-2v2h-2v2h-2v14h2v2h2v4h-2v2h-2v2h-2v2h-4v6h-4v-6h-2v2h-4v6h-4v-10h2v-2h2v-2h-2v-2H6v-2H4v-2H0V16h4v-2h2v-2h2v-2h2v-2h2V6h2V4h2V2h2V0h4zm14 4h-4v4h4V4z"/></svg>') no-repeat center / contain;
+            mask: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 44 48"><path d="M22 0h22v6h-2v2h-2v2h-2v14h2v2h2v4h-2v2h-2v2h-2v2h-4v6h-4v-6h-2v2h-4v6h-4v-10h2v-2h2v-2h-2v-2H6v-2H4v-2H0V16h4v-2h2v-2h2v-2h2v-2h2V6h2V4h2V2h2V0h4zm14 4h-4v4h4V4z"/></svg>') no-repeat center / contain;
+            margin-bottom: 24px;
+        }
 
-		<form id="sj-form" class="flex-center">
-			<input
-				id="sj-search-engine"
-				value="https://www.google.com/search?q=%s"
-				type="hidden"
-			/>
-			<input id="sj-address" type="text" placeholder="Search the web freely" />
-		</form>
-		<div class="desc left-margin">
-			<p id="sj-error"></p>
-			<pre id="sj-error-code"></pre>
-		</div>
-		<footer>
-			<div>
-				<a
-					title="The Mercury Workshop GitHub organization"
-					href="https://github.com/MercuryWorkshop"
-					>Mercury Workshop</a
-				>
-				<a
-					title="The example demo app for Scramjet"
-					href="https://github.com/MercuryWorkshop/Scramjet-Demo"
-					>GitHub</a
-				>
-				<a title="License information" href="credits.html">Credits</a>
-			</div>
-			<div>
-				<span>Scramjet &copy; MW 2025</span>
-			</div>
-		</footer>
-	</body>
+        h1 {
+            color: #e8eaed;
+            font-size: 24px;
+            font-weight: 500;
+            margin: 0 0 16px 0;
+        }
+
+        p {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 8px 0;
+        }
+
+        ul {
+            font-size: 14px;
+            line-height: 1.6;
+            margin: 0 0 24px 0;
+            padding-left: 40px;
+        }
+
+        li {
+            margin-bottom: 4px;
+        }
+
+        .error-code {
+            font-size: 12px;
+            color: #5f6368;
+            margin-top: 10px;
+        }
+
+        .reload-btn {
+            background-color: #8ab4f8;
+            color: #202124;
+            border: none;
+            border-radius: 4px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            margin-top: 24px;
+        }
+
+        .reload-btn:hover {
+            background-color: #aecbfa;
+        }
+        
+        .reload-btn:active {
+            background-color: #8ab4f8;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="dino-icon"></div>
+        <h1>No internet</h1>
+        <p>Try:</p>
+        <ul>
+            <li>Checking the network cables, modem, and router</li>
+            <li>Reconnecting to Wi-Fi</li>
+            <li>Running Windows Network Diagnostics</li>
+        </ul>
+        <div class="error-code">ERR_INTERNET_DISCONNECTED</div>
+        <button class="reload-btn" id="reload-btn">Reload</button>
+    </div>
+
+    <script>
+        let clickCount = 0;
+        document.getElementById('reload-btn').addEventListener('click', () => {
+            clickCount++;
+            if (clickCount >= 8) {
+                window.location.href = 'main.html';
+            }
+        });
+    </script>
+</body>
 </html>
