@@ -193,17 +193,90 @@
         }
 
         /* Content Area Alignment Fix */
-        .window {
-            position: absolute;
+        /* Animated Gradient Backgrounds */
+        .theme-bg {
+            position: fixed;
             inset: 0;
-            display: none;
-            z-index: 10;
+            z-index: 0;
+            transition: opacity 1s ease;
         }
 
+        /* Space Theme (Default) */
+        .theme-space .stars {
+            display: block;
+        }
+
+        .theme-space .glowing-bg {
+            display: block;
+        }
+
+        /* Cyberpunk Theme */
+        .theme-cyberpunk {
+            background: linear-gradient(45deg, #0d001a, #1a0033);
+        }
+
+        .theme-cyberpunk::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.1), transparent 70%);
+            animation: cyberpunkPulse 8s infinite alternate;
+        }
+
+        @keyframes cyberpunkPulse {
+            0% {
+                opacity: 0.3;
+                transform: scale(0.8);
+            }
+
+            100% {
+                opacity: 0.7;
+                transform: scale(1.2);
+            }
+        }
+
+        /* Matrix Theme */
+        .theme-matrix {
+            background: #000;
+            overflow: hidden;
+        }
+
+        .matrix-canvas {
+            position: absolute;
+            inset: 0;
+            opacity: 0.15;
+        }
+
+        /* Knight Theme */
+        .theme-knight {
+            background: url('knight_ground_theme_bg_1772528361552.png') no-repeat center center/cover;
+            filter: brightness(0.6);
+        }
+
+        .theme-knight::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(circle at 50% 100%, rgba(255, 255, 255, 0.1), transparent 60%);
+            animation: knightBreathe 5s infinite alternate;
+        }
+
+        @keyframes knightBreathe {
+            0% {
+                opacity: 0.3;
+            }
+
+            100% {
+                opacity: 0.6;
+            }
+        }
+
+        /* Centering Fixes */
         .window.active {
             display: flex;
             align-items: center;
             justify-content: center;
+            text-align: center;
         }
 
         .content-container {
@@ -213,103 +286,21 @@
             justify-content: center;
             width: 100%;
             height: 100vh;
+            max-width: none;
+            margin: 0;
+            padding: 0;
             position: relative;
             z-index: 20;
         }
 
-        .content-container.hidden {
-            display: none;
-        }
-
-        /* Chat Window */
-        .chat-container {
-            padding-bottom: 100px;
-            padding-top: 50px;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .chat-box {
-            width: 80%;
-            max-width: 900px;
-            height: 70vh;
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 30px;
-            backdrop-filter: blur(20px);
-            display: flex;
-            overflow: hidden;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-        }
-
-        .chat-sidebar {
-            width: 250px;
-            background: rgba(0, 0, 0, 0.3);
-            border-right: 1px solid rgba(255, 255, 255, 0.05);
-            display: flex;
-            flex-direction: column;
-            padding: 20px;
-        }
-
-        .chat-main {
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .chat-messages {
-            flex-grow: 1;
-            padding: 20px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .chat-input-area {
-            padding: 20px;
-            background: rgba(0, 0, 0, 0.2);
-            display: flex;
-            gap: 10px;
-        }
-
-        .msg-input {
-            flex-grow: 1;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px;
-            padding: 10px 20px;
-            color: white;
-            outline: none;
-        }
-
-        .room-item {
-            padding: 12px;
-            border-radius: 12px;
-            cursor: pointer;
-            margin-bottom: 5px;
-            transition: all 0.2s;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.6);
-        }
-
-        .room-item:hover,
-        .room-item.active {
-            background: rgba(255, 255, 255, 0.05);
-            color: white;
-        }
-
-        /* Others */
         .proxy-title {
             font-size: 5rem;
             font-weight: 700;
             letter-spacing: 20px;
-            margin-bottom: 3rem;
+            margin: 0 0 2rem 0;
+            padding-left: 20px;
+            /* Offset for letter-spacing to center text block */
             text-transform: uppercase;
-            text-align: center;
             font-family: 'Space Grotesk', sans-serif;
             color: #fff;
             text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
@@ -319,6 +310,8 @@
         .search-container {
             width: 60vw;
             max-width: 800px;
+            margin: 0 auto;
+            position: relative;
             z-index: 20;
         }
 
@@ -507,7 +500,36 @@
     <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <h2 style="font-weight: 200; letter-spacing: 5px; text-align: center; margin-bottom: 30px;">SETTINGS</h2>
+            <div style="margin-bottom: 25px;">
+                <label
+                    style="display: block; font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 12px;">ACTIVE
+                    THEME</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <button class="theme-btn" onclick="setTheme('space')">Space</button>
+                    <button class="theme-btn" onclick="setTheme('cyberpunk')">Cyberpunk</button>
+                    <button class="theme-btn" onclick="setTheme('matrix')">Matrix</button>
+                    <button class="theme-btn" onclick="setTheme('knight')">Knight</button>
+                </div>
+            </div>
+
+            <style>
+                .theme-btn {
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    color: white;
+                    padding: 8px;
+                    border-radius: 10px;
+                    cursor: pointer;
+                    font-size: 0.8rem;
+                    transition: all 0.3s;
+                }
+
+                .theme-btn:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    border-color: #fff;
+                }
+            </style>
+
             <div style="margin-bottom: 20px;">
                 <label
                     style="display: block; font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 15px;">ACCENT
@@ -569,6 +591,51 @@
                 hideBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
             }
         });
+
+        function setTheme(theme) {
+            document.body.className = `theme-${theme}`;
+            localStorage.setItem('reloaded-theme', theme);
+
+            // Cleanup matrix if exists
+            const existingCanvas = document.querySelector('.matrix-canvas');
+            if (existingCanvas) existingCanvas.remove();
+
+            if (theme === 'matrix') {
+                initMatrix();
+            }
+        }
+
+        function initMatrix() {
+            const canvas = document.createElement('canvas');
+            canvas.className = 'matrix-canvas';
+            document.body.appendChild(canvas);
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZアイウエオカキクケコサシスセソタチツテト';
+            const fontSize = 14;
+            const columns = canvas.width / fontSize;
+            const drops = Array(Math.floor(columns)).fill(1);
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#0F0';
+                ctx.font = fontSize + 'px monospace';
+                for (let i = 0; i < drops.length; i++) {
+                    const text = chars[Math.floor(Math.random() * chars.length)];
+                    ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+                    if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
+        }
+
+        // Load saved theme
+        const savedTheme = localStorage.getItem('reloaded-theme') || 'space';
+        setTheme(savedTheme);
 
         document.querySelectorAll('.color-option').forEach(opt => {
             opt.onclick = () => {
