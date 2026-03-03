@@ -197,7 +197,6 @@
             position: absolute;
             inset: 0;
             display: none;
-            flex-direction: column;
             z-index: 10;
         }
 
@@ -213,9 +212,13 @@
             align-items: center;
             justify-content: center;
             width: 100%;
-            height: 100%;
-            margin-top: -50px;
-            /* Slight offset for better visual balance */
+            height: 100vh;
+            position: relative;
+            z-index: 20;
+        }
+
+        .content-container.hidden {
+            display: none;
         }
 
         /* Chat Window */
@@ -320,24 +323,25 @@
 
         #sj-address {
             width: 100%;
-            height: 70px;
-            border-radius: 35px;
-            background: rgba(255, 255, 255, 0.03);
+            height: 75px;
+            border-radius: 40px;
+            background: rgba(255, 255, 255, 0.04);
             border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
             text-align: center;
-            font-size: 1.4rem;
+            font-size: 1.5rem;
             outline: none;
-            backdrop-filter: blur(25px);
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(30px) saturate(180%);
+            transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+            box-shadow: 0 15px 45px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
         }
 
         #sj-address:focus {
             border-color: var(--accent-color);
-            background: rgba(255, 255, 255, 0.07);
-            box-shadow: 0 0 40px rgba(255, 255, 255, 0.1);
-            transform: scale(1.02);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
+            transform: scale(1.03) translateY(-5px);
         }
 
         .frame-container {
