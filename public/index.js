@@ -98,11 +98,40 @@ window.closeTab = function (id) {
 	if (activeTabId === id) switchTab(tabs.length > 0 ? tabs[tabs.length - 1].id : null);
 };
 // Tab system
-addTabBtn.onclick = () => { switchTab(null); address.focus(); };
+addTabBtn.onclick = () => {
+	switchTab(null);
+	address.focus();
+};
+
+function updateTabTitles() {
+	tabs.forEach(t => {
+		try {
+			// Try to get the title from the iframe
+			const title = t.frame.frame.contentWindow ? t.frame.frame.contentDocument.title : null;
+			if (title && title !== "" && title !== "Scramjet") {
+				const titleEl = t.tabEl.querySelector(".tab-title");
+				if (titleEl && titleEl.textContent !== title) {
+					titleEl.textContent = title;
+				}
+			}
+		} catch (e) {
+			// Probably a cross-origin or loading issue, ignore
+		}
+	});
+}
+
+setInterval(updateTabTitles, 1000);
 
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
-	try { await registerSW(); } catch (err) { }
+	if (!address.value.trim()) return;
+
+	try {
+		await registerSW();
+	} catch (err) {
+		console.error("SW failed:", err);
+	}
+
 	const url = search(address.value, searchEngine.value);
 	await setupTransport();
 	createTab(url);
