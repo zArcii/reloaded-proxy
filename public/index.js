@@ -66,7 +66,6 @@ function createTab(url = null) {
 
 function switchTab(id) {
 	if (id === null) {
-		// Show home screen (Browser home)
 		activeTabId = null;
 		mainContent.classList.remove("hidden");
 		tabs.forEach(t => {
@@ -83,10 +82,6 @@ function switchTab(id) {
 		if (t.id === id) {
 			t.container.classList.add("active");
 			t.tabEl.classList.add("active");
-			try {
-				const title = t.frame.frame.contentDocument.title;
-				if (title) t.tabEl.querySelector(".tab-title").textContent = title;
-			} catch (e) { }
 		} else {
 			t.container.classList.remove("active");
 			t.tabEl.classList.remove("active");
@@ -97,106 +92,116 @@ function switchTab(id) {
 window.closeTab = function (id) {
 	const index = tabs.findIndex((t) => t.id === id);
 	if (index === -1) return;
-
-	const tab = tabs[index];
-	tab.container.remove();
-	tab.tabEl.remove();
+	tabs[index].container.remove();
+	tabs[index].tabEl.remove();
 	tabs.splice(index, 1);
-
-	if (activeTabId === id) {
-		if (tabs.length > 0) {
-			switchTab(tabs[tabs.length - 1].id);
-		} else {
-			switchTab(null);
-		}
-	}
+	if (activeTabId === id) switchTab(tabs.length > 0 ? tabs[tabs.length - 1].id : null);
 };
 
-addTabBtn.onclick = () => {
-	switchTab(null);
-	address.focus();
-};
+addTabBtn.onclick = () => { switchTab(null); address.focus(); };
 
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
-
-	try {
-		await registerSW();
-	} catch (err) {
-		error.textContent = "Failed to register service worker.";
-		errorCode.textContent = err.toString();
-		throw err;
-	}
-
+	try { await registerSW(); } catch (err) { }
 	const url = search(address.value, searchEngine.value);
 	await setupTransport();
-
 	createTab(url);
 	address.value = "";
 });
 
-// Chat Logic
+// REAL CHAT LOGIC via WebSockets
 const chatMessages = document.getElementById("chat-messages");
 const msgInput = document.getElementById("msg-input");
 const sendBtn = document.querySelector(".btn-send");
 const roomItems = document.querySelectorAll(".room-item");
 
 let currentRoom = "Public Square";
-let chatData = {
-	"Public Square": [{ user: "System", text: "Welcome to the Public Square!" }],
-	"Gaming Room": [{ user: "System", text: "Welcome to the Gaming Room!" }],
-	"Dev Chat": [{ user: "System", text: "Welcome to the Dev Chat!" }]
-};
+let ws;
+let username = localStorage.getItem("reloaded-user") || "User" + Math.floor(Math.random() * 1000);
 
-function renderMessages() {
-	chatMessages.innerHTML = `<div style="opacity: 0.5; font-size: 0.8rem; text-align: center;">Welcome to Reloaded ${currentRoom}</div>`;
-	(chatData[currentRoom] || []).forEach(msg => {
-		const div = document.createElement("div");
-		div.style.padding = "5px 10px";
-		div.style.borderRadius = "10px";
-		div.style.background = "rgba(255,255,255,0.05)";
-		div.style.marginBottom = "5px";
-		div.innerHTML = `<span style="color: var(--accent-color); font-weight: 600;">${msg.user}:</span> ${msg.text}`;
-		chatMessages.appendChild(div);
-	});
+function connectChat() {
+	const protocol = location.protocol === "https:" ? "wss:" : "ws:";
+	// Point to Render backend for chat
+	ws = new WebSocket(`${protocol}//reloadedproxy.onrender.com/chat`);
+
+	ws.onopen = () => {
+		ws.send(JSON.stringify({ type: "join", room: currentRoom }));
+	};
+
+	ws.onmessage = (event) => {
+		const msg = JSON.parse(event.data);
+		if (msg.type === "chat" && msg.room === currentRoom) {
+			appendMessage(msg.user, msg.text);
+		}
+	};
+
+	ws.onclose = () => {
+		setTimeout(connectChat, 3000); // Reconnect
+	};
+}
+
+function appendMessage(user, text) {
+	const div = document.createElement("div");
+	div.style.padding = "8px 15px";
+	div.style.borderRadius = "15px";
+	div.style.background = "rgba(255,255,255,0.03)";
+	div.style.marginBottom = "8px";
+	div.style.alignSelf = user === username ? "flex-end" : "flex-start";
+	div.style.maxWidth = "80%";
+	div.innerHTML = `<span style="color: var(--accent-color); font-weight: 600; font-size: 0.8rem; display: block; margin-bottom: 2px;">${user}</span>${text}`;
+	chatMessages.appendChild(div);
 	chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+function sendMessage() {
+	const text = msgInput.value.trim();
+	if (!text || ws.readyState !== 1) return;
+
+	ws.send(JSON.stringify({ type: "chat", user: username, text: text }));
+	msgInput.value = "";
 }
 
 sendBtn.onclick = sendMessage;
 msgInput.onkeypress = (e) => { if (e.key === "Enter") sendMessage(); };
 
-function sendMessage() {
-	const text = msgInput.value.trim();
-	if (!text) return;
-
-	if (!chatData[currentRoom]) chatData[currentRoom] = [];
-	chatData[currentRoom].push({ user: "You", text });
-	msgInput.value = "";
-	renderMessages();
-}
-
 roomItems.forEach(item => {
-	item.onclick = () => {
+	item.addEventListener("click", () => {
 		if (item.textContent.includes("+")) {
 			const name = prompt("Enter private room name:");
-			if (name) {
-				const newRoom = document.createElement("div");
-				newRoom.className = "room-item";
-				newRoom.textContent = name;
-				newRoom.onclick = () => selectRoom(newRoom, name);
-				item.parentElement.insertBefore(newRoom, item);
-				chatData[name] = [{ user: "System", text: `Private room ${name} created.` }];
-				selectRoom(newRoom, name);
-			}
+			if (name) createRoom(name);
 			return;
 		}
 		selectRoom(item, item.textContent);
-	};
+	});
 });
+
+function createRoom(name) {
+	const newRoom = document.createElement("div");
+	newRoom.className = "room-item";
+	newRoom.textContent = name;
+	newRoom.onclick = () => selectRoom(newRoom, name);
+	document.querySelector(".chat-sidebar").insertBefore(newRoom, document.querySelector(".chat-sidebar > div:last-child"));
+	selectRoom(newRoom, name);
+}
 
 function selectRoom(el, name) {
 	document.querySelectorAll(".room-item").forEach(i => i.classList.remove("active"));
 	el.classList.add("active");
 	currentRoom = name;
-	renderMessages();
+	chatMessages.innerHTML = `<div style="opacity: 0.3; font-size: 0.7rem; text-align: center; margin-bottom: 20px;">Connected to # ${name}</div>`;
+	if (ws && ws.readyState === 1) {
+		ws.send(JSON.stringify({ type: "join", room: currentRoom }));
+	}
 }
+
+// Ask for username on first chat visit
+window.addEventListener("load", () => {
+	connectChat();
+	if (!localStorage.getItem("reloaded-user")) {
+		const val = prompt("Enter a username for chat:");
+		if (val) {
+			username = val;
+			localStorage.setItem("reloaded-user", val);
+		}
+	}
+});
