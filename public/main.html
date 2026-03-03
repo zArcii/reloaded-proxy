@@ -305,14 +305,15 @@
         /* Others */
         .proxy-title {
             font-size: 5rem;
-            font-weight: 600;
-            letter-spacing: 25px;
+            font-weight: 700;
+            letter-spacing: 20px;
             margin-bottom: 3rem;
             text-transform: uppercase;
             text-align: center;
-            color: var(--accent-color);
-            text-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-            animation: float 4s ease-in-out infinite, textGlow 3s ease-in-out infinite alternate;
+            font-family: 'Space Grotesk', sans-serif;
+            color: #fff;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.4), 0 0 30px rgba(255, 255, 255, 0.2);
+            animation: float 4s ease-in-out infinite;
         }
 
         .search-container {
@@ -342,6 +343,39 @@
             background: rgba(255, 255, 255, 0.08);
             box-shadow: 0 0 50px rgba(255, 255, 255, 0.1);
             transform: scale(1.03) translateY(-5px);
+        }
+
+        /* Hide UI Button */
+        .hide-ui-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 5000;
+            color: white;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .hide-ui-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+        }
+
+        .hide-ui-btn.active {
+            opacity: 0.3;
+        }
+
+        .ui-hidden {
+            display: none !important;
         }
 
         .frame-container {
@@ -414,18 +448,10 @@
             border-radius: 30px;
             width: 400px;
         }
-
-        .btn-send {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 0 20px;
-            border-radius: 15px;
-            cursor: pointer;
-            font-weight: 600;
-        }
     </style>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&family=Space+Grotesk:wght@700&display=swap"
+        rel="stylesheet">
 </head>
 
 <body>
@@ -433,7 +459,7 @@
     <div class="glowing-bg"></div>
 
     <!-- Floating Oval Navigation -->
-    <div class="floating-sidebar">
+    <div class="floating-sidebar" id="main-dock">
         <div class="side-item active">
             <span>Web Browser</span>
         </div>
@@ -454,6 +480,17 @@
             <span>New Tab</span>
         </button>
     </nav>
+
+    <!-- Hide UI Toggle -->
+    <div class="hide-ui-btn" id="hide-ui-toggle" title="Toggle UI">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path
+                d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19">
+            </path>
+            <line x1="1" y1="1" x2="23" y2="23"></line>
+        </svg>
+    </div>
 
     <!-- Browser Window -->
     <div id="window-browser" class="window active">
@@ -515,6 +552,24 @@
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
         }
 
+        // Hide UI Toggle Logic
+        const hideBtn = document.getElementById('hide-ui-toggle');
+        const mainDock = document.getElementById('main-dock');
+        const tabNav = document.getElementById('browser-tabs-nav');
+
+        hideBtn.addEventListener('click', () => {
+            const isHidden = mainDock.classList.toggle('ui-hidden');
+            tabNav.classList.toggle('ui-hidden');
+            hideBtn.classList.toggle('active');
+
+            // Update icon based on state
+            if (isHidden) {
+                hideBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>`;
+            } else {
+                hideBtn.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"></path><line x1="1" y1="1" x2="23" y2="23"></line></svg>`;
+            }
+        });
+
         document.querySelectorAll('.color-option').forEach(opt => {
             opt.onclick = () => {
                 const color = opt.dataset.color;
@@ -524,5 +579,7 @@
         });
     </script>
 </body>
+
+</html>
 
 </html>
