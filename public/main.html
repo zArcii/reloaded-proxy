@@ -8,6 +8,7 @@
 
     <script src="scram/scramjet.all.js"></script>
     <script src="baremux/index.js"></script>
+    <link rel="shortcut icon" href="favicon.png" />
 
     <link rel="stylesheet" href="index.css" />
     <script src="register-sw.js" defer></script>
@@ -20,7 +21,7 @@
             --bg-glow: rgba(255, 255, 255, 0.05);
             --star-color: #ffffff;
             --text-color: #ffffff;
-            --nav-bg: rgba(0, 0, 0, 0.5);
+            --nav-bg: rgba(0, 0, 0, 0.4);
         }
 
         body,
@@ -31,7 +32,7 @@
             height: 100%;
             background-color: #000;
             overflow: hidden;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Outfit', sans-serif;
             color: var(--text-color);
             position: relative;
         }
@@ -82,355 +83,261 @@
         @keyframes pulse {
             0% {
                 transform: translate(-50%, -50%) scale(0.9);
-                opacity: 0.7;
+                opacity: 0.5;
             }
 
             100% {
                 transform: translate(-50%, -50%) scale(1.1);
-                opacity: 1;
+                opacity: 0.8;
             }
         }
 
-        /* Navigation / Tabs */
+        /* Floating Oval Sidebar/Taskbar */
+        .floating-sidebar {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            height: 60px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 30px;
+            display: flex;
+            align-items: center;
+            padding: 0 10px;
+            z-index: 2000;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            gap: 5px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .side-item {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 44px;
+            padding: 0 20px;
+            border-radius: 22px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+            font-weight: 500;
+            gap: 10px;
+            white-space: nowrap;
+        }
+
+        .side-item i {
+            font-size: 1.2rem;
+        }
+
+        .side-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .side-item.active {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Tab System at Top */
         .nav-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: auto;
+            max-width: 90%;
             z-index: 1000;
             display: flex;
             align-items: center;
-            padding: 12px 24px;
+            padding: 8px 15px;
             background: rgba(0, 0, 0, 0.4);
             backdrop-filter: blur(20px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
             box-sizing: border-box;
-            gap: 15px;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-container.hidden {
+            transform: translate(-50%, -100px);
+            opacity: 0;
         }
 
         .tabs-list {
             display: flex;
-            gap: 12px;
+            gap: 8px;
             overflow-x: auto;
-            flex-grow: 1;
-            padding: 4px;
             scrollbar-width: none;
-        }
-
-        .tabs-list::-webkit-scrollbar {
-            display: none;
+            padding: 2px;
         }
 
         .tab {
-            padding: 10px 20px;
+            padding: 8px 15px;
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 12px;
-            font-size: 0.9rem;
+            font-size: 0.8rem;
             cursor: pointer;
             white-space: nowrap;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s;
             display: flex;
             align-items: center;
-            gap: 12px;
-            color: rgba(255, 255, 255, 0.6);
-            min-width: 120px;
-            max-width: 200px;
-        }
-
-        .tab:hover {
-            background: rgba(255, 255, 255, 0.08);
-            transform: translateY(-2px);
-            color: #fff;
+            gap: 8px;
+            color: rgba(255, 255, 255, 0.5);
+            min-width: 100px;
         }
 
         .tab.active {
             background: rgba(255, 255, 255, 0.1);
             border-color: var(--accent-color);
             color: #fff;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
         }
 
-        .tab-icon {
-            width: 16px;
-            height: 16px;
-            opacity: 0.7;
-        }
-
-        .tab-title {
-            flex-grow: 1;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-
-        .tab-close {
-            width: 20px;
-            height: 20px;
-            border-radius: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-            opacity: 0.5;
-        }
-
-        .tab-close:hover {
-            background: rgba(255, 255, 255, 0.1);
-            opacity: 1;
-            color: #ff6b6b;
-        }
-
-        .add-tab-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            color: white;
-            border-radius: 10px;
-            width: 36px;
-            height: 36px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .add-tab-btn:hover {
-            background: var(--accent-color);
-            color: #000;
-            transform: scale(1.05);
-        }
-
-        .settings-btn {
-            margin-left: 15px;
-            background: none;
-            border: none;
-            color: white;
-            font-size: 1.6rem;
-            cursor: pointer;
-            opacity: 0.7;
-            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
-        }
-
-        .settings-btn:hover {
-            opacity: 1;
-            transform: rotate(90deg);
-        }
-
-        /* Content Area */
-        .content-container {
-            position: relative;
+        /* Multi-Window Content */
+        .window {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
             z-index: 10;
+        }
+
+        .window.active {
+            display: flex;
+        }
+
+        /* Browser Window */
+        .content-container {
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+
+        /* Chat Window */
+        .chat-container {
+            padding-bottom: 100px;
+            padding-top: 50px;
+            height: 100vh;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100vh;
-            transition: opacity 0.4s ease, transform 0.4s ease;
         }
 
-        .content-container.hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
-            position: absolute;
-            width: 100%;
+        .chat-box {
+            width: 80%;
+            max-width: 900px;
+            height: 70vh;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 30px;
+            backdrop-filter: blur(20px);
+            display: flex;
+            overflow: hidden;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
         }
 
+        .chat-sidebar {
+            width: 250px;
+            background: rgba(0, 0, 0, 0.3);
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+
+        .chat-main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-messages {
+            flex-grow: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .chat-input-area {
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            display: flex;
+            gap: 10px;
+        }
+
+        .msg-input {
+            flex-grow: 1;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            padding: 10px 20px;
+            color: white;
+            outline: none;
+        }
+
+        .room-item {
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            margin-bottom: 5px;
+            transition: all 0.2s;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .room-item:hover,
+        .room-item.active {
+            background: rgba(255, 255, 255, 0.05);
+            color: white;
+        }
+
+        /* Others */
         .proxy-title {
-            font-size: 4rem;
-            font-weight: 300;
-            letter-spacing: 20px;
-            margin-bottom: 2.5rem;
+            font-size: 3.5rem;
+            letter-spacing: 15px;
             text-transform: uppercase;
-            animation: float 4s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
-            color: var(--accent-color);
-            transition: color 0.3s;
-        }
-
-        @keyframes textGlow {
-            from {
-                text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
-            }
-
-            to {
-                text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 40px var(--accent-color);
-            }
-        }
-
-        @keyframes float {
-            0% {
-                transform: translateY(0px);
-            }
-
-            50% {
-                transform: translateY(-15px);
-            }
-
-            100% {
-                transform: translateY(0px);
-            }
+            margin-bottom: 2rem;
         }
 
         .search-container {
-            position: relative;
             width: 50vw;
-            max-width: 700px;
-            animation: float 5s ease-in-out infinite alternate-reverse;
-        }
-
-        #sj-form {
-            width: 100%;
-            display: flex;
-            justify-content: center;
+            max-width: 600px;
         }
 
         #sj-address {
             width: 100%;
-            height: 65px;
-            border-radius: 35px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.03);
-            padding: 0 35px;
-            font-size: 1.3rem;
+            height: 60px;
+            border-radius: 30px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             color: #fff;
-            backdrop-filter: blur(15px);
-            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            outline: none;
             text-align: center;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
         }
 
         #sj-address:focus {
             border-color: var(--accent-color);
-            box-shadow: 0 0 40px rgba(255, 255, 255, 0.15), inset 0 0 10px rgba(255, 255, 255, 0.05);
-            background: rgba(255, 255, 255, 0.07);
-            transform: scale(1.02);
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.1);
         }
 
-        #sj-address::placeholder {
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 1px;
-        }
-
-        .by-text {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            font-size: 0.9rem;
-            color: rgba(255, 255, 255, 0.3);
-            letter-spacing: 3px;
-            z-index: 10;
-            text-transform: uppercase;
-        }
-
-        /* Settings Modal */
-        .modal {
-            display: none;
-            position: fixed;
-            inset: 0;
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(15px);
-            z-index: 2000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
-        .modal-content {
-            background: #0a0a0a;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 40px;
-            border-radius: 30px;
-            width: 450px;
-            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
-            transform: scale(0.9);
-            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
-        }
-
-        @keyframes scaleIn {
-            to {
-                transform: scale(1);
-            }
-        }
-
-        .modal-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 30px;
-        }
-
-        .modal-title {
-            font-size: 1.8rem;
-            font-weight: 200;
-            letter-spacing: 5px;
-        }
-
-        .close-modal {
-            cursor: pointer;
-            font-size: 2rem;
-            opacity: 0.5;
-            transition: opacity 0.2s;
-        }
-
-        .close-modal:hover {
-            opacity: 1;
-        }
-
-        .setting-item {
-            margin-bottom: 30px;
-        }
-
-        .setting-label {
-            display: block;
-            margin-bottom: 15px;
-            font-size: 0.8rem;
-            color: rgba(255, 255, 255, 0.4);
-            letter-spacing: 2px;
-            text-transform: uppercase;
-        }
-
-        .color-picker-grid {
-            display: grid;
-            grid-template-columns: repeat(6, 1fr);
-            gap: 15px;
-        }
-
-        .color-option {
-            aspect-ratio: 1;
-            border-radius: 12px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-        }
-
-        .color-option:hover {
-            transform: translateY(-3px);
-        }
-
-        .color-option.selected {
-            border-color: #fff;
-            box-shadow: 0 0 20px currentColor;
-        }
-
-        /* Iframes */
         .frame-container {
             position: fixed;
             inset: 0;
-            top: 55px;
+            top: 0;
             z-index: 500;
-            background: #000;
+            background: #fff;
             display: none;
         }
 
@@ -438,147 +345,168 @@
             display: block;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
+        /* Settings Modal Overhaul */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(15px);
+            z-index: 3000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 30px;
+            width: 400px;
+        }
+
+        .btn-send {
+            background: var(--accent-color);
+            color: #000;
             border: none;
-            background: #fff;
+            padding: 0 20px;
+            border-radius: 15px;
+            cursor: pointer;
+            font-weight: 600;
         }
     </style>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600&display=swap" rel="stylesheet">
 </head>
 
 <body>
     <div class="stars" id="stars"></div>
-    <div class="glowing-bg" id="main-glow"></div>
+    <div class="glowing-bg"></div>
 
-    <nav class="nav-container">
-        <div class="tabs-list" id="tabs-list">
-            <!-- Tabs added dynamically -->
+    <!-- Floating Oval Navigation -->
+    <div class="floating-sidebar">
+        <div class="side-item active" onclick="switchWindow('browser')">
+            <span>Web Browser</span>
         </div>
-        <button class="add-tab-btn" id="add-tab" title="New Tab">+</button>
-        <button class="settings-btn" id="open-settings" title="Settings">⚙</button>
+        <div class="side-item" onclick="switchWindow('chat')">
+            <span>Reloaded Chat</span>
+        </div>
+        <div class="side-item" onclick="toggleSettings()">
+            <span>Settings</span>
+        </div>
+    </div>
+
+    <!-- Top Tab Bar (Only for Browser) -->
+    <nav class="nav-container" id="browser-tabs-nav">
+        <div class="tabs-list" id="tabs-list"></div>
+        <button class="add-tab-btn" id="add-tab">+</button>
     </nav>
 
-    <div class="content-container" id="main-content">
-        <h1 class="proxy-title" id="main-title">Reloaded</h1>
+    <!-- Browser Window -->
+    <div id="window-browser" class="window window-browser active">
+        <div class="content-container active" id="main-content">
+            <h1 class="proxy-title">Reloaded</h1>
+            <form id="sj-form" class="search-container">
+                <input id="sj-search-engine" value="https://duckduckgo.com/?q=%s" type="hidden" />
+                <input id="sj-address" type="text" placeholder="Search the web freely..." autocomplete="off" />
+            </form>
+        </div>
+        <div id="frames-container"></div>
+    </div>
 
-        <form id="sj-form" class="search-container">
-            <input id="sj-search-engine" value="https://duckduckgo.com/?q=%s" type="hidden" />
-            <input id="sj-address" type="text" placeholder="Search with DuckDuckGo..." autocomplete="off" />
-        </form>
-
-        <div class="messages">
-            <p id="sj-error"></p>
-            <pre id="sj-error-code"></pre>
+    <!-- Chat Window -->
+    <div id="window-chat" class="window window-chat">
+        <div class="chat-container">
+            <div class="chat-box">
+                <div class="chat-sidebar">
+                    <h3 style="font-weight: 200; letter-spacing: 2px; margin-bottom: 20px;">ROOMS</h3>
+                    <div class="room-item active">Public Square</div>
+                    <div class="room-item">Gaming Room</div>
+                    <div class="room-item">Dev Chat</div>
+                    <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
+                        <div class="room-item" style="color: var(--accent-color);">+ Create Private</div>
+                    </div>
+                </div>
+                <div class="chat-main">
+                    <div class="chat-messages" id="chat-messages">
+                        <div style="opacity: 0.5; font-size: 0.8rem; text-align: center;">Welcome to Reloaded Public
+                            Chat</div>
+                    </div>
+                    <div class="chat-input-area">
+                        <input type="text" class="msg-input" placeholder="Type a message..." id="msg-input">
+                        <button class="btn-send">Send</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
-
-    <div id="frames-container">
-        <!-- Iframes added dynamically -->
-    </div>
-
-    <div class="by-text">by ArciiTaken</div>
 
     <!-- Settings Modal -->
     <div class="modal" id="settings-modal">
         <div class="modal-content">
-            <div class="modal-header">
-                <div class="modal-title">THEME</div>
-                <div class="close-modal" id="close-settings">&times;</div>
-            </div>
-
-            <div class="setting-item">
-                <label class="setting-label">Accent Color</label>
-                <div class="color-picker-grid" id="accent-colors">
-                    <div class="color-option selected" style="background: #ffffff; color: #ffffff;"
+            <h2 style="font-weight: 200; letter-spacing: 5px; text-align: center; margin-bottom: 30px;">SETTINGS</h2>
+            <div style="margin-bottom: 20px;">
+                <label
+                    style="display: block; font-size: 0.7rem; color: rgba(255,255,255,0.4); margin-bottom: 15px;">ACCENT
+                    COLOR</label>
+                <div style="display: flex; gap: 10px;" id="accent-colors">
+                    <div class="color-option"
+                        style="width:30px;height:30px;border-radius:50%;background:#ffffff;cursor:pointer;"
                         data-color="#ffffff"></div>
-                    <div class="color-option" style="background: #8ab4f8; color: #8ab4f8;" data-color="#8ab4f8"></div>
-                    <div class="color-option" style="background: #f88ab4; color: #f88ab4;" data-color="#f88ab4"></div>
-                    <div class="color-option" style="background: #b4f88a; color: #b4f88a;" data-color="#b4f88a"></div>
-                    <div class="color-option" style="background: #f8c88a; color: #f8c88a;" data-color="#f8c88a"></div>
-                    <div class="color-option" style="background: #c88af8; color: #c88af8;" data-color="#c88af8"></div>
+                    <div class="color-option"
+                        style="width:30px;height:30px;border-radius:50%;background:#8ab4f8;cursor:pointer;"
+                        data-color="#8ab4f8"></div>
+                    <div class="color-option"
+                        style="width:30px;height:30px;border-radius:50%;background:#f88ab4;cursor:pointer;"
+                        data-color="#f88ab4"></div>
+                    <div class="color-option"
+                        style="width:30px;height:30px;border-radius:50%;background:#b4f88a;cursor:pointer;"
+                        data-color="#b4f88a"></div>
                 </div>
             </div>
-
-            <div class="setting-item">
-                <label class="setting-label">Glow Intensity</label>
-                <input type="range" id="glow-range" min="0" max="100" value="50"
-                    style="width: 100%; accent-color: var(--accent-color);">
-            </div>
-
-            <div class="setting-item">
-                <label class="setting-label">Search Provider</label>
-                <select id="search-select"
-                    style="width: 100%; background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; outline: none;">
-                    <option value="https://duckduckgo.com/?q=%s">DuckDuckGo (Default)</option>
-                    <option value="https://www.google.com/search?q=%s">Google</option>
-                    <option value="https://www.bing.com/search?q=%s">Bing</option>
-                </select>
-            </div>
-
-            <div
-                style="margin-top: 30px; font-size: 0.7rem; text-align: center; color: rgba(255,255,255,0.2); letter-spacing: 2px;">
-                RELOADED PROXY &bull; ARCII TAKEN
-            </div>
+            <button onclick="toggleSettings()"
+                style="width: 100%; padding: 12px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: white; border-radius: 15px; cursor: pointer;">Close</button>
         </div>
     </div>
 
     <script>
-        // Star Generation
-        const starsContainer = document.getElementById('stars');
         function createStars() {
-            starsContainer.innerHTML = '';
-            for (let i = 0; i < 200; i++) {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 150; i++) {
                 const star = document.createElement('div');
-                star.classList.add('star');
-                const size = Math.random() * 2 + 1;
-                star.style.width = size + 'px';
-                star.style.height = size + 'px';
+                star.className = 'star';
+                star.style.width = star.style.height = (Math.random() * 2 + 1) + 'px';
                 star.style.left = Math.random() * 100 + 'vw';
                 star.style.top = Math.random() * 100 + 'vh';
-                star.style.setProperty('--duration', (Math.random() * 3 + 3) + 's');
-                starsContainer.appendChild(star);
+                star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
+                container.appendChild(star);
             }
         }
         createStars();
 
-        // Theme Logic
-        const settingsModal = document.getElementById('settings-modal');
-        const openSettings = document.getElementById('open-settings');
-        const closeSettings = document.getElementById('close-settings');
-        const accentColors = document.querySelectorAll('#accent-colors .color-option');
-        const glowRange = document.getElementById('glow-range');
-        const searchSelect = document.getElementById('search-select');
+        function switchWindow(type) {
+            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
+            document.querySelectorAll('.side-item').forEach(i => i.classList.remove('active'));
 
-        openSettings.onclick = () => settingsModal.style.display = 'flex';
-        closeSettings.onclick = () => settingsModal.style.display = 'none';
-        window.onclick = (e) => { if (e.target == settingsModal) settingsModal.style.display = 'none'; };
+            document.getElementById(`window-${type}`).classList.add('active');
+            event.currentTarget.classList.add('active');
 
-        accentColors.forEach(opt => {
+            const tabNav = document.getElementById('browser-tabs-nav');
+            if (type === 'browser') tabNav.classList.remove('hidden');
+            else tabNav.classList.add('hidden');
+        }
+
+        function toggleSettings() {
+            const modal = document.getElementById('settings-modal');
+            modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
+        }
+
+        document.querySelectorAll('.color-option').forEach(opt => {
             opt.onclick = () => {
-                accentColors.forEach(o => o.classList.remove('selected'));
-                opt.classList.add('selected');
                 const color = opt.dataset.color;
                 document.documentElement.style.setProperty('--accent-color', color);
                 document.documentElement.style.setProperty('--star-color', color);
-                document.documentElement.style.setProperty('--bg-glow', color + '0D');
             };
         });
-
-        glowRange.oninput = () => {
-            const val = glowRange.value;
-            const size = 600 + (val * 4);
-            const opacity = 0.3 + (val / 200);
-            const glow = document.getElementById('main-glow');
-            glow.style.width = size + 'px';
-            glow.style.height = size + 'px';
-            glow.style.opacity = opacity;
-        };
-
-        searchSelect.onchange = () => {
-            document.getElementById('sj-search-engine').value = searchSelect.value;
-            document.getElementById('sj-address').placeholder = `Search with ${searchSelect.options[searchSelect.selectedIndex].text.split(' ')[0]}...`;
-        };
     </script>
 </body>
 

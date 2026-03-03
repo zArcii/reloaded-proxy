@@ -66,7 +66,7 @@ function createTab(url = null) {
 
 function switchTab(id) {
 	if (id === null) {
-		// Show home screen
+		// Show home screen (Browser home)
 		activeTabId = null;
 		mainContent.classList.remove("hidden");
 		tabs.forEach(t => {
@@ -83,7 +83,6 @@ function switchTab(id) {
 		if (t.id === id) {
 			t.container.classList.add("active");
 			t.tabEl.classList.add("active");
-			// Update tab title if possible from iframe title
 			try {
 				const title = t.frame.frame.contentDocument.title;
 				if (title) t.tabEl.querySelector(".tab-title").textContent = title;
@@ -135,3 +134,69 @@ form.addEventListener("submit", async (event) => {
 	createTab(url);
 	address.value = "";
 });
+
+// Chat Logic
+const chatMessages = document.getElementById("chat-messages");
+const msgInput = document.getElementById("msg-input");
+const sendBtn = document.querySelector(".btn-send");
+const roomItems = document.querySelectorAll(".room-item");
+
+let currentRoom = "Public Square";
+let chatData = {
+	"Public Square": [{ user: "System", text: "Welcome to the Public Square!" }],
+	"Gaming Room": [{ user: "System", text: "Welcome to the Gaming Room!" }],
+	"Dev Chat": [{ user: "System", text: "Welcome to the Dev Chat!" }]
+};
+
+function renderMessages() {
+	chatMessages.innerHTML = `<div style="opacity: 0.5; font-size: 0.8rem; text-align: center;">Welcome to Reloaded ${currentRoom}</div>`;
+	(chatData[currentRoom] || []).forEach(msg => {
+		const div = document.createElement("div");
+		div.style.padding = "5px 10px";
+		div.style.borderRadius = "10px";
+		div.style.background = "rgba(255,255,255,0.05)";
+		div.style.marginBottom = "5px";
+		div.innerHTML = `<span style="color: var(--accent-color); font-weight: 600;">${msg.user}:</span> ${msg.text}`;
+		chatMessages.appendChild(div);
+	});
+	chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+sendBtn.onclick = sendMessage;
+msgInput.onkeypress = (e) => { if (e.key === "Enter") sendMessage(); };
+
+function sendMessage() {
+	const text = msgInput.value.trim();
+	if (!text) return;
+
+	if (!chatData[currentRoom]) chatData[currentRoom] = [];
+	chatData[currentRoom].push({ user: "You", text });
+	msgInput.value = "";
+	renderMessages();
+}
+
+roomItems.forEach(item => {
+	item.onclick = () => {
+		if (item.textContent.includes("+")) {
+			const name = prompt("Enter private room name:");
+			if (name) {
+				const newRoom = document.createElement("div");
+				newRoom.className = "room-item";
+				newRoom.textContent = name;
+				newRoom.onclick = () => selectRoom(newRoom, name);
+				item.parentElement.insertBefore(newRoom, item);
+				chatData[name] = [{ user: "System", text: `Private room ${name} created.` }];
+				selectRoom(newRoom, name);
+			}
+			return;
+		}
+		selectRoom(item, item.textContent);
+	};
+});
+
+function selectRoom(el, name) {
+	document.querySelectorAll(".room-item").forEach(i => i.classList.remove("active"));
+	el.classList.add("active");
+	currentRoom = name;
+	renderMessages();
+}
