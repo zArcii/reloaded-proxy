@@ -15,6 +15,14 @@
     <script src="index.js" defer></script>
 
     <style>
+        :root {
+            --accent-color: #ffffff;
+            --bg-glow: rgba(255, 255, 255, 0.05);
+            --star-color: #ffffff;
+            --text-color: #ffffff;
+            --nav-bg: rgba(0, 0, 0, 0.5);
+        }
+
         body,
         html {
             margin: 0;
@@ -24,7 +32,7 @@
             background-color: #000;
             overflow: hidden;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            color: white;
+            color: var(--text-color);
             position: relative;
         }
 
@@ -40,9 +48,9 @@
 
         .star {
             position: absolute;
-            background: white;
+            background: var(--star-color);
             border-radius: 50%;
-            box-shadow: 0 0 10px white, 0 0 20px white;
+            box-shadow: 0 0 10px var(--star-color), 0 0 20px var(--star-color);
             animation: twinkle var(--duration, 4s) infinite ease-in-out alternate;
         }
 
@@ -64,7 +72,7 @@
             left: 50%;
             width: 800px;
             height: 800px;
-            background: radial-gradient(circle, rgba(255, 255, 255, 0.05) 0%, transparent 60%);
+            background: radial-gradient(circle, var(--bg-glow) 0%, transparent 60%);
             transform: translate(-50%, -50%);
             z-index: 1;
             pointer-events: none;
@@ -83,6 +91,116 @@
             }
         }
 
+        /* Navigation / Tabs */
+        .nav-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            background: var(--nav-bg);
+            backdrop-filter: blur(5px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-sizing: border-box;
+        }
+
+        .tabs-list {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            flex-grow: 1;
+            padding-bottom: 2px;
+            scrollbar-width: none;
+        }
+
+        .tabs-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            padding: 8px 18px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            white-space: nowrap;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
+        .tab.active {
+            background: var(--accent-color);
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 0 15px var(--accent-color);
+        }
+
+        .tab-close {
+            font-size: 1.2rem;
+            line-height: 1;
+            border-radius: 50%;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .tab-close:hover {
+            background: rgba(0, 0, 0, 0.1);
+        }
+
+        .add-tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            color: white;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            cursor: pointer;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 10px;
+            transition: all 0.2s;
+        }
+
+        .add-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: scale(1.1);
+        }
+
+        .settings-btn {
+            margin-left: 15px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.6rem;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.2s;
+        }
+
+        .settings-btn:hover {
+            opacity: 1;
+            transform: rotate(90deg);
+        }
+
+        /* Content Area */
         .content-container {
             position: relative;
             z-index: 10;
@@ -90,25 +208,36 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            height: 100%;
+            height: 100vh;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+        }
+
+        .content-container.hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            position: absolute;
+            width: 100%;
         }
 
         .proxy-title {
-            font-size: 3rem;
+            font-size: 4rem;
             font-weight: 300;
-            letter-spacing: 15px;
-            margin-bottom: 2rem;
+            letter-spacing: 20px;
+            margin-bottom: 2.5rem;
             text-transform: uppercase;
             animation: float 4s ease-in-out infinite, textGlow 2s ease-in-out infinite alternate;
+            color: var(--accent-color);
+            transition: color 0.3s;
         }
 
         @keyframes textGlow {
             from {
-                text-shadow: 0 0 5px #fff, 0 0 10px #fff;
+                text-shadow: 0 0 5px var(--accent-color), 0 0 10px var(--accent-color);
             }
 
             to {
-                text-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px #aaa;
+                text-shadow: 0 0 10px var(--accent-color), 0 0 20px var(--accent-color), 0 0 40px var(--accent-color);
             }
         }
 
@@ -118,7 +247,7 @@
             }
 
             50% {
-                transform: translateY(-10px);
+                transform: translateY(-15px);
             }
 
             100% {
@@ -129,11 +258,10 @@
         .search-container {
             position: relative;
             width: 50vw;
-            max-width: 600px;
+            max-width: 700px;
             animation: float 5s ease-in-out infinite alternate-reverse;
         }
 
-        /* Override index.css form for new style */
         #sj-form {
             width: 100%;
             display: flex;
@@ -142,74 +270,185 @@
 
         #sj-address {
             width: 100%;
-            height: 60px;
-            border-radius: 30px;
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            background: rgba(255, 255, 255, 0.05);
-            padding: 0 30px;
-            font-size: 1.2rem;
+            height: 65px;
+            border-radius: 35px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.03);
+            padding: 0 35px;
+            font-size: 1.3rem;
             color: #fff;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-            transition: all 0.3s ease;
+            backdrop-filter: blur(15px);
+            box-shadow: 0 5px 25px rgba(0, 0, 0, 0.3);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             outline: none;
             text-align: center;
         }
 
         #sj-address:focus {
-            border-color: rgba(255, 255, 255, 0.8);
-            box-shadow: 0 0 30px rgba(255, 255, 255, 0.3), inset 0 0 10px rgba(255, 255, 255, 0.1);
-            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--accent-color);
+            box-shadow: 0 0 40px rgba(255, 255, 255, 0.15), inset 0 0 10px rgba(255, 255, 255, 0.05);
+            background: rgba(255, 255, 255, 0.07);
+            transform: scale(1.02);
         }
 
         #sj-address::placeholder {
-            color: rgba(255, 255, 255, 0.5);
-            text-align: center;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 1px;
         }
 
         .by-text {
             position: absolute;
             bottom: 30px;
             left: 30px;
-            font-size: 1rem;
-            color: rgba(255, 255, 255, 0.5);
-            letter-spacing: 2px;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.3);
+            letter-spacing: 3px;
             z-index: 10;
+            text-transform: uppercase;
         }
 
-        .messages {
-            margin-top: 1rem;
-            text-align: center;
+        /* Settings Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(15px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.3s ease;
         }
 
-        #sj-error {
-            color: #ffaaaa !important;
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
         }
 
-        /* Iframe when proxying */
-        #sj-frame {
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            position: absolute;
-            z-index: 9999;
+        .modal-content {
+            background: #0a0a0a;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 40px;
+            border-radius: 30px;
+            width: 450px;
+            box-shadow: 0 0 100px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            animation: scaleIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes scaleIn {
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 200;
+            letter-spacing: 5px;
+        }
+
+        .close-modal {
+            cursor: pointer;
+            font-size: 2rem;
+            opacity: 0.5;
+            transition: opacity 0.2s;
+        }
+
+        .close-modal:hover {
+            opacity: 1;
+        }
+
+        .setting-item {
+            margin-bottom: 30px;
+        }
+
+        .setting-label {
+            display: block;
+            margin-bottom: 15px;
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+        }
+
+        .color-picker-grid {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 15px;
+        }
+
+        .color-option {
+            aspect-ratio: 1;
+            border-radius: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+        }
+
+        .color-option:hover {
+            transform: translateY(-3px);
+        }
+
+        .color-option.selected {
+            border-color: #fff;
+            box-shadow: 0 0 20px currentColor;
+        }
+
+        /* Iframes */
+        .frame-container {
+            position: fixed;
+            inset: 0;
+            top: 55px;
+            z-index: 500;
+            background: #000;
+            display: none;
+        }
+
+        .frame-container.active {
+            display: block;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
             background: #fff;
-            /* iframe background needs to be solid */
         }
     </style>
 </head>
 
 <body>
     <div class="stars" id="stars"></div>
-    <div class="glowing-bg"></div>
+    <div class="glowing-bg" id="main-glow"></div>
 
-    <div class="content-container">
-        <h1 class="proxy-title">Reloaded</h1>
+    <nav class="nav-container">
+        <div class="tabs-list" id="tabs-list">
+            <!-- Tabs added dynamically -->
+        </div>
+        <button class="add-tab-btn" id="add-tab" title="New Tab">+</button>
+        <button class="settings-btn" id="open-settings" title="Settings">⚙</button>
+    </nav>
+
+    <div class="content-container" id="main-content">
+        <h1 class="proxy-title" id="main-title">Reloaded</h1>
 
         <form id="sj-form" class="search-container">
-            <input id="sj-search-engine" value="https://www.google.com/search?q=%s" type="hidden" />
-            <input id="sj-address" type="text" placeholder="Search the web freely..." autocomplete="off" />
+            <input id="sj-search-engine" value="https://duckduckgo.com/?q=%s" type="hidden" />
+            <input id="sj-address" type="text" placeholder="Search with DuckDuckGo..." autocomplete="off" />
         </form>
 
         <div class="messages">
@@ -218,29 +457,112 @@
         </div>
     </div>
 
+    <div id="frames-container">
+        <!-- Iframes added dynamically -->
+    </div>
+
     <div class="by-text">by ArciiTaken</div>
 
+    <!-- Settings Modal -->
+    <div class="modal" id="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">THEME</div>
+                <div class="close-modal" id="close-settings">&times;</div>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Accent Color</label>
+                <div class="color-picker-grid" id="accent-colors">
+                    <div class="color-option selected" style="background: #ffffff; color: #ffffff;"
+                        data-color="#ffffff"></div>
+                    <div class="color-option" style="background: #8ab4f8; color: #8ab4f8;" data-color="#8ab4f8"></div>
+                    <div class="color-option" style="background: #f88ab4; color: #f88ab4;" data-color="#f88ab4"></div>
+                    <div class="color-option" style="background: #b4f88a; color: #b4f88a;" data-color="#b4f88a"></div>
+                    <div class="color-option" style="background: #f8c88a; color: #f8c88a;" data-color="#f8c88a"></div>
+                    <div class="color-option" style="background: #c88af8; color: #c88af8;" data-color="#c88af8"></div>
+                </div>
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Glow Intensity</label>
+                <input type="range" id="glow-range" min="0" max="100" value="50"
+                    style="width: 100%; accent-color: var(--accent-color);">
+            </div>
+
+            <div class="setting-item">
+                <label class="setting-label">Search Provider</label>
+                <select id="search-select"
+                    style="width: 100%; background: #1a1a1a; color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 10px; outline: none;">
+                    <option value="https://duckduckgo.com/?q=%s">DuckDuckGo (Default)</option>
+                    <option value="https://www.google.com/search?q=%s">Google</option>
+                    <option value="https://www.bing.com/search?q=%s">Bing</option>
+                </select>
+            </div>
+
+            <div
+                style="margin-top: 30px; font-size: 0.7rem; text-align: center; color: rgba(255,255,255,0.2); letter-spacing: 2px;">
+                RELOADED PROXY &bull; ARCII TAKEN
+            </div>
+        </div>
+    </div>
+
     <script>
-        // Generate stars for space theme
+        // Star Generation
         const starsContainer = document.getElementById('stars');
-        for (let i = 0; i < 150; i++) {
-            const star = document.createElement('div');
-            star.classList.add('star');
-
-            // Random size big and small
-            const size = Math.random() * 3 + 1;
-            star.style.width = size + 'px';
-            star.style.height = size + 'px';
-
-            // Random position
-            star.style.left = Math.random() * 100 + 'vw';
-            star.style.top = Math.random() * 100 + 'vh';
-
-            // Random duration
-            star.style.setProperty('--duration', (Math.random() * 3 + 2) + 's');
-
-            starsContainer.appendChild(star);
+        function createStars() {
+            starsContainer.innerHTML = '';
+            for (let i = 0; i < 200; i++) {
+                const star = document.createElement('div');
+                star.classList.add('star');
+                const size = Math.random() * 2 + 1;
+                star.style.width = size + 'px';
+                star.style.height = size + 'px';
+                star.style.left = Math.random() * 100 + 'vw';
+                star.style.top = Math.random() * 100 + 'vh';
+                star.style.setProperty('--duration', (Math.random() * 3 + 3) + 's');
+                starsContainer.appendChild(star);
+            }
         }
+        createStars();
+
+        // Theme Logic
+        const settingsModal = document.getElementById('settings-modal');
+        const openSettings = document.getElementById('open-settings');
+        const closeSettings = document.getElementById('close-settings');
+        const accentColors = document.querySelectorAll('#accent-colors .color-option');
+        const glowRange = document.getElementById('glow-range');
+        const searchSelect = document.getElementById('search-select');
+
+        openSettings.onclick = () => settingsModal.style.display = 'flex';
+        closeSettings.onclick = () => settingsModal.style.display = 'none';
+        window.onclick = (e) => { if (e.target == settingsModal) settingsModal.style.display = 'none'; };
+
+        accentColors.forEach(opt => {
+            opt.onclick = () => {
+                accentColors.forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                const color = opt.dataset.color;
+                document.documentElement.style.setProperty('--accent-color', color);
+                document.documentElement.style.setProperty('--star-color', color);
+                document.documentElement.style.setProperty('--bg-glow', color + '0D');
+            };
+        });
+
+        glowRange.oninput = () => {
+            const val = glowRange.value;
+            const size = 600 + (val * 4);
+            const opacity = 0.3 + (val / 200);
+            const glow = document.getElementById('main-glow');
+            glow.style.width = size + 'px';
+            glow.style.height = size + 'px';
+            glow.style.opacity = opacity;
+        };
+
+        searchSelect.onchange = () => {
+            document.getElementById('sj-search-engine').value = searchSelect.value;
+            document.getElementById('sj-address').placeholder = `Search with ${searchSelect.options[searchSelect.selectedIndex].text.split(' ')[0]}...`;
+        };
     </script>
 </body>
 

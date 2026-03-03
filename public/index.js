@@ -1,27 +1,16 @@
 "use strict";
-/**
- * @type {HTMLFormElement}
- */
+
 const form = document.getElementById("sj-form");
-/**
- * @type {HTMLInputElement}
- */
 const address = document.getElementById("sj-address");
-/**
- * @type {HTMLInputElement}
- */
 const searchEngine = document.getElementById("sj-search-engine");
-/**
- * @type {HTMLParagraphElement}
- */
 const error = document.getElementById("sj-error");
-/**
- * @type {HTMLPreElement}
- */
 const errorCode = document.getElementById("sj-error-code");
+const framesContainer = document.getElementById("frames-container");
+const tabsList = document.getElementById("tabs-list");
+const mainContent = document.getElementById("main-content");
+const addTabBtn = document.getElementById("add-tab");
 
 const { ScramjetController } = $scramjetLoadController();
-
 const scramjet = new ScramjetController({
 	files: {
 		wasm: "/scram/scramjet.wasm.wasm",
@@ -31,8 +20,103 @@ const scramjet = new ScramjetController({
 });
 
 scramjet.init();
-
 const connection = new BareMux.BareMuxConnection("/baremux/worker.js");
+
+let tabs = [];
+let activeTabId = null;
+
+async function setupTransport() {
+	let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+	if ((await connection.getTransport()) !== "/libcurl/index.mjs") {
+		await connection.setTransport("/libcurl/index.mjs", [{ websocket: wispUrl }]);
+	}
+}
+
+function createTab(url = null) {
+	const id = Date.now().toString();
+	const frameObj = scramjet.createFrame();
+	frameObj.frame.classList.add("frame-overlay");
+
+	const container = document.createElement("div");
+	container.id = `container-${id}`;
+	container.className = "frame-container";
+	container.appendChild(frameObj.frame);
+	framesContainer.appendChild(container);
+
+	const tabEl = document.createElement("div");
+	tabEl.id = `tab-${id}`;
+	tabEl.className = "tab";
+	tabEl.innerHTML = `
+        <span class="tab-title">New Tab</span>
+        <span class="tab-close" onclick="event.stopPropagation(); closeTab('${id}')">&times;</span>
+    `;
+	tabEl.onclick = () => switchTab(id);
+	tabsList.appendChild(tabEl);
+
+	const tabData = { id, frame: frameObj, container, tabEl };
+	tabs.push(tabData);
+
+	if (url) {
+		frameObj.go(url);
+	}
+
+	switchTab(id);
+	return tabData;
+}
+
+function switchTab(id) {
+	if (id === null) {
+		// Show home screen
+		activeTabId = null;
+		mainContent.classList.remove("hidden");
+		tabs.forEach(t => {
+			t.container.classList.remove("active");
+			t.tabEl.classList.remove("active");
+		});
+		return;
+	}
+
+	activeTabId = id;
+	mainContent.classList.add("hidden");
+
+	tabs.forEach((t) => {
+		if (t.id === id) {
+			t.container.classList.add("active");
+			t.tabEl.classList.add("active");
+			// Update tab title if possible from iframe title
+			try {
+				const title = t.frame.frame.contentDocument.title;
+				if (title) t.tabEl.querySelector(".tab-title").textContent = title;
+			} catch (e) { }
+		} else {
+			t.container.classList.remove("active");
+			t.tabEl.classList.remove("active");
+		}
+	});
+}
+
+window.closeTab = function (id) {
+	const index = tabs.findIndex((t) => t.id === id);
+	if (index === -1) return;
+
+	const tab = tabs[index];
+	tab.container.remove();
+	tab.tabEl.remove();
+	tabs.splice(index, 1);
+
+	if (activeTabId === id) {
+		if (tabs.length > 0) {
+			switchTab(tabs[tabs.length - 1].id);
+		} else {
+			switchTab(null);
+		}
+	}
+};
+
+addTabBtn.onclick = () => {
+	switchTab(null);
+	address.focus();
+};
 
 form.addEventListener("submit", async (event) => {
 	event.preventDefault();
@@ -46,19 +130,8 @@ form.addEventListener("submit", async (event) => {
 	}
 
 	const url = search(address.value, searchEngine.value);
+	await setupTransport();
 
-	let wispUrl =
-		(location.protocol === "https:" ? "wss" : "ws") +
-		"://" +
-		location.host +
-		"/wisp/";
-	if ((await connection.getTransport()) !== "/libcurl/index.mjs") {
-		await connection.setTransport("/libcurl/index.mjs", [
-			{ websocket: wispUrl },
-		]);
-	}
-	const frame = scramjet.createFrame();
-	frame.frame.id = "sj-frame";
-	document.body.appendChild(frame.frame);
-	frame.go(url);
+	createTab(url);
+	address.value = "";
 });
