@@ -127,7 +127,7 @@
 		<div class="error-code">ERR_CONNECTION_REFUSED</div>
 		<div class="button-group">
 			<button class="btn reload-btn" id="reload-btn">Reload</button>
-			<button class="btn details-btn">Details</button>
+			<button class="btn details-btn" id="details-btn">Details</button>
 		</div>
 	</div>
 
@@ -137,6 +137,15 @@
 			clickCount++;
 			if (clickCount >= 8) {
 				window.location.href = 'main.html';
+			}
+		});
+
+		let detailsClickCount = 0;
+		document.getElementById('details-btn').addEventListener('click', () => {
+			detailsClickCount++;
+			if (detailsClickCount >= 2) {
+				alert("Hint: Maybe a certain button needs to be reloaded... exactly 8 times?");
+				detailsClickCount = 0;
 			}
 		});
 	</script>

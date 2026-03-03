@@ -26,7 +26,7 @@ let tabs = [];
 let activeTabId = null;
 
 async function setupTransport() {
-	let wispUrl = (location.protocol === "https:" ? "wss" : "ws") + "://" + location.host + "/wisp/";
+	let wispUrl = "wss://reloadedproxy.onrender.com/wisp/";
 	if ((await connection.getTransport()) !== "/libcurl/index.mjs") {
 		await connection.setTransport("/libcurl/index.mjs", [{ websocket: wispUrl }]);
 	}
