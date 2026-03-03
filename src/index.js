@@ -20,40 +20,6 @@ Object.assign(wisp.options, {
 	dns_servers: ["1.1.1.3", "1.0.0.3"],
 });
 
-import { WebSocketServer } from "ws";
-
-const wss = new WebSocketServer({ noServer: true });
-const rooms = new Map(); // roomName -> Set of sockets
-
-wss.on("connection", (ws, req) => {
-	let currentRoom = "Public Square";
-
-	ws.on("message", (data) => {
-		try {
-			const msg = JSON.parse(data.toString());
-			if (msg.type === "join") {
-				// Remove from old room
-				if (rooms.has(currentRoom)) rooms.get(currentRoom).delete(ws);
-				currentRoom = msg.room;
-				// Add to new room
-				if (!rooms.has(currentRoom)) rooms.set(currentRoom, new Set());
-				rooms.get(currentRoom).add(ws);
-			} else if (msg.type === "chat") {
-				const broadcast = JSON.stringify({ type: "chat", user: msg.user, text: msg.text, room: currentRoom });
-				if (rooms.has(currentRoom)) {
-					for (const client of rooms.get(currentRoom)) {
-						if (client.readyState === 1) client.send(broadcast);
-					}
-				}
-			}
-		} catch (e) { }
-	});
-
-	ws.on("close", () => {
-		if (rooms.has(currentRoom)) rooms.get(currentRoom).delete(ws);
-	});
-});
-
 const fastify = Fastify({
 	serverFactory: (handler) => {
 		const server = createServer()
@@ -63,15 +29,8 @@ const fastify = Fastify({
 				handler(req, res);
 			})
 			.on("upgrade", (req, socket, head) => {
-				if (req.url.endsWith("/wisp/")) {
-					wisp.routeRequest(req, socket, head);
-				} else if (req.url.endsWith("/chat")) {
-					wss.handleUpgrade(req, socket, head, (ws) => {
-						wss.emit("connection", ws, req);
-					});
-				} else {
-					socket.end();
-				}
+				if (req.url.endsWith("/wisp/")) wisp.routeRequest(req, socket, head);
+				else socket.end();
 			});
 		return server;
 	},

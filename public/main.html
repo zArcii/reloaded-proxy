@@ -392,25 +392,29 @@
 
     <!-- Floating Oval Navigation -->
     <div class="floating-sidebar">
-        <div class="side-item active" onclick="switchWindow('browser')">
+        <div class="side-item active">
             <span>Web Browser</span>
-        </div>
-        <div class="side-item" onclick="switchWindow('chat')">
-            <span>Reloaded Chat</span>
         </div>
         <div class="side-item" onclick="toggleSettings()">
             <span>Settings</span>
         </div>
     </div>
 
-    <!-- Top Tab Bar (Only for Browser) -->
+    <!-- Top Tab Bar -->
     <nav class="nav-container" id="browser-tabs-nav">
         <div class="tabs-list" id="tabs-list"></div>
-        <button class="add-tab-btn" id="add-tab">+</button>
+        <button class="add-tab-btn" id="add-tab">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
+                stroke-linecap="round" stroke-linejoin="round">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>New Tab</span>
+        </button>
     </nav>
 
     <!-- Browser Window -->
-    <div id="window-browser" class="window window-browser active">
+    <div id="window-browser" class="window active">
         <div class="content-container active" id="main-content">
             <h1 class="proxy-title">Reloaded</h1>
             <form id="sj-form" class="search-container">
@@ -419,33 +423,6 @@
             </form>
         </div>
         <div id="frames-container"></div>
-    </div>
-
-    <!-- Chat Window -->
-    <div id="window-chat" class="window window-chat">
-        <div class="chat-container">
-            <div class="chat-box">
-                <div class="chat-sidebar">
-                    <h3 style="font-weight: 200; letter-spacing: 2px; margin-bottom: 20px;">ROOMS</h3>
-                    <div class="room-item active">Public Square</div>
-                    <div class="room-item">Gaming Room</div>
-                    <div class="room-item">Dev Chat</div>
-                    <div style="margin-top: auto; padding-top: 10px; border-top: 1px solid rgba(255,255,255,0.05);">
-                        <div class="room-item" style="color: var(--accent-color);">+ Create Private</div>
-                    </div>
-                </div>
-                <div class="chat-main">
-                    <div class="chat-messages" id="chat-messages">
-                        <div style="opacity: 0.5; font-size: 0.8rem; text-align: center;">Welcome to Reloaded Public
-                            Chat</div>
-                    </div>
-                    <div class="chat-input-area">
-                        <input type="text" class="msg-input" placeholder="Type a message..." id="msg-input">
-                        <button class="btn-send">Send</button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
     <!-- Settings Modal -->
@@ -491,18 +468,6 @@
         }
         createStars();
 
-        function switchWindow(type) {
-            document.querySelectorAll('.window').forEach(w => w.classList.remove('active'));
-            document.querySelectorAll('.side-item').forEach(i => i.classList.remove('active'));
-
-            document.getElementById(`window-${type}`).classList.add('active');
-            event.currentTarget.classList.add('active');
-
-            const tabNav = document.getElementById('browser-tabs-nav');
-            if (type === 'browser') tabNav.classList.remove('hidden');
-            else tabNav.classList.add('hidden');
-        }
-
         function toggleSettings() {
             const modal = document.getElementById('settings-modal');
             modal.style.display = modal.style.display === 'flex' ? 'none' : 'flex';
@@ -517,5 +482,7 @@
         });
     </script>
 </body>
+
+</html>
 
 </html>
